@@ -1,8 +1,8 @@
 import streamlit as st
 from auth import check_session, logout
-import pages.dashboard as dashboard
-import pages.login as login
-import pages.helpdesk as helpdesk
+import app_pages.dashboard as dashboard
+import app_pages.login as login
+import app_pages.helpdesk as helpdesk
 
 # 🔹 Verifica se há usuário logado
 if "user" not in st.session_state or not st.session_state["user"]:

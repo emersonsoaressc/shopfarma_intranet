@@ -1,7 +1,7 @@
 import streamlit as st
 from database import get_user_tickets  # Para listar chamados do Helpdesk
 
-def dashboard_show():
+def show():
     st.title("📊 Dashboard - Gestão Interna")
 
     # Verifica se o usuário está logado
