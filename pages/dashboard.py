@@ -1,18 +1,21 @@
 import streamlit as st
 
 def show():
-    # 🔹 Garantir que "current_page" existe no session_state
+    # 🔹 Inicializa session_state["current_page"] se não existir
     if "current_page" not in st.session_state:
-        st.session_state["current_page"] = "dashboard"  # Página inicial padrão
+        st.session_state["current_page"] = "dashboard"  # Define o valor padrão
 
     st.title("📊 Dashboard Principal")
 
     # 🔹 Exibir informações do usuário logado
-    if "user" in st.session_state:
+    if "user" in st.session_state and st.session_state["user"]:
         user_data = st.session_state["user"]
-        st.markdown(f"👤 **Usuário:** {user_data['nome']} ({user_data['cargo']})")
+        st.markdown(f"👤 **Usuário:** {user_data.get('nome', 'Desconhecido')} ({user_data.get('cargo', 'Sem cargo')})")
+    else:
+        st.error("⚠️ Usuário não autenticado. Faça login novamente.")
+        st.stop()
 
-    # 🔹 Layout dos cards principais
+    # 🔹 Criar botões para navegação entre as páginas
     col1, col2, col3 = st.columns(3)
 
     with col1:
@@ -30,7 +33,7 @@ def show():
             st.session_state["current_page"] = "helpdesk"
             st.experimental_rerun()
 
-    # 🔹 Controle de navegação entre as páginas
+    # 🔹 Exibir conteúdos das páginas selecionadas dinamicamente
     if st.session_state["current_page"] == "estoque":
         st.subheader("📦 Gestão de Estoque")
         st.write("Aqui ficará a funcionalidade de gestão de estoque.")
