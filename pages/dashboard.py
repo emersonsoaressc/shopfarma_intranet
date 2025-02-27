@@ -16,12 +16,14 @@ def show():
         st.error("⚠️ Usuário não autenticado. Faça login novamente.")
         st.stop()
 
-    # 🔹 Menu lateral (removido botão duplicado!)
-    with st.sidebar:
-        st.title("📌 Opções")
-        if st.button("🔄 Logout", key="logout_sidebar"):
-            st.session_state.clear()
-            st.experimental_rerun()
+    # 🔹 Garante que a sidebar seja exibida apenas uma vez
+    if "sidebar_loaded" not in st.session_state:
+        with st.sidebar:
+            st.title("📌 Opções")
+            if st.button("🔄 Logout", key="logout_sidebar_button"):
+                st.session_state.clear()
+                st.experimental_rerun()
+        st.session_state["sidebar_loaded"] = True  # 🔹 Marcar que já foi carregado
 
     # 🔹 Somente o COO pode aprovar usuários
     if user_data.get("cargo") == "Diretor de Operações (COO)":
