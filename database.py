@@ -1,20 +1,19 @@
-import streamlit as st
 import firebase_admin
 from firebase_admin import credentials, firestore
+import streamlit as st
 import json
 
-# 🔹 Inicializa o Firebase apenas uma vez
+# 🔹 Carregar credenciais do Firebase do Streamlit Secrets
+firebase_secrets = json.loads(json.dumps(st.secrets["FIREBASE"]))  # Convertendo para JSON corretamente
+
+# 🔹 Inicializar Firebase apenas se ainda não estiver inicializado
 if not firebase_admin._apps:
-    try:
-        # 🔹 Pega as credenciais do Streamlit Secrets
-        firebase_config = json.loads(st.secrets["FIREBASE"])
-        cred = credentials.Certificate(firebase_config)
-        firebase_admin.initialize_app(cred)
-    except Exception as e:
-        st.error(f"Erro ao inicializar Firebase: {e}")
+    cred = credentials.Certificate(firebase_secrets)
+    firebase_admin.initialize_app(cred)
 
 # 🔹 Conectar ao Firestore
 db = firestore.client()
+
 
 # -------------------------- [ USUÁRIOS ] --------------------------
 
