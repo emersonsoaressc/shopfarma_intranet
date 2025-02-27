@@ -75,9 +75,18 @@ def approve_user(email):
     return False
 
 def get_pending_users():
-    """Retorna todos os usuários pendentes de aprovação."""
-    users = db.collection("usuarios").where("status", "==", "Pendente").stream()  # 🔹 CORRIGIDO
-    return [{"id": user.id, **user.to_dict()} for user in users]
+    """Retorna usuários que ainda não foram aprovados."""
+    users_ref = db.collection("usuarios")
+    query = users_ref.where("aprovado", "==", False).stream()  # Garante que pega apenas os pendentes
+
+    pending_users = []
+    for doc in query:
+        user_data = doc.to_dict()
+        user_data["id"] = doc.id  # Inclui o ID do documento Firestore
+        pending_users.append(user_data)
+
+    return pending_users
+
 
 # -------------------------- [ HELP DESK ] --------------------------
 
