@@ -57,7 +57,7 @@ def create_user(nome, email, senha, cargo, loja, whatsapp):
 def get_user(email, senha):
     """Busca um usuário no Firestore com base no e-mail e senha."""
     users_ref = db.collection("usuarios")
-    query = users_ref.where("email", "==", email).stream()
+    query = users_ref.where(filter=("email", "==", email)).stream()  # ✅ Correção do WARNING
 
     for doc in query:
         user = doc.to_dict()
@@ -73,6 +73,11 @@ def approve_user(email):
         user_ref.update({"status": "Aprovado"})
         return True
     return False
+
+def get_pending_users():
+    """Retorna todos os usuários pendentes de aprovação."""
+    users = db.collection("usuarios").where(filter=("status", "==", "Pendente")).stream()
+    return [{"id": user.id, **user.to_dict()} for user in users]
 
 # -------------------------- [ HELP DESK ] --------------------------
 
@@ -112,12 +117,12 @@ def create_ticket(usuario_id, titulo, descricao, categoria, urgencia="Média", l
     doc_ref.set(ticket_data)
 
 def get_user_tickets(usuario_id):
-    """Retorna os chamados de um usuário"""
-    tickets = db.collection("chamados").where("usuario_id", "==", usuario_id).stream()
+    """Retorna os chamados de um usuário."""
+    tickets = db.collection("chamados").where(filter=("usuario_id", "==", usuario_id)).stream()  # ✅ Correção do WARNING
     return [{"id": ticket.id, **ticket.to_dict()} for ticket in tickets]
 
 def update_ticket_status(ticket_id, new_status, usuario_id, responsaveis=None):
-    """Atualiza o status de um chamado e registra no histórico"""
+    """Atualiza o status de um chamado e registra no histórico."""
     ticket_ref = db.collection("chamados").document(ticket_id)
     ticket = ticket_ref.get()
 
@@ -136,7 +141,7 @@ def update_ticket_status(ticket_id, new_status, usuario_id, responsaveis=None):
         ticket_ref.update(ticket_data)
 
 def upload_file(ticket_id, file_type, file_url, usuario_id):
-    """Faz o upload de arquivos (orçamentos, notas fiscais, boletos) e atualiza o chamado"""
+    """Faz o upload de arquivos (orçamentos, notas fiscais, boletos) e atualiza o chamado."""
     ticket_ref = db.collection("chamados").document(ticket_id)
     ticket = ticket_ref.get()
 
@@ -158,6 +163,6 @@ def upload_file(ticket_id, file_type, file_url, usuario_id):
         ticket_ref.update(ticket_data)
 
 def get_pending_tickets():
-    """Retorna todos os chamados que ainda não foram finalizados"""
-    tickets = db.collection("chamados").where("status", "!=", "Chamado finalizado").stream()
+    """Retorna todos os chamados que ainda não foram finalizados."""
+    tickets = db.collection("chamados").where(filter=("status", "!=", "Chamado finalizado")).stream()  # ✅ Correção do WARNING
     return [{"id": ticket.id, **ticket.to_dict()} for ticket in tickets]
