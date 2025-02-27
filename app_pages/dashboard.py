@@ -19,7 +19,8 @@ def show():
 
     # 📌 📊 Exibir cards diferentes por cargo 📊 📌
     cols1, cols2, cols3 = st.columns(3)
-    
+
+    """  
     if user["cargo"] == "Diretor de Operações (COO)":
         st.subheader("📊 Indicadores da Rede")
         with cols1:
@@ -42,6 +43,7 @@ def show():
 
     else:
         st.info("⚠️ Nenhum dashboard disponível para este cargo.")
+    """
 
     st.markdown("---")
 
