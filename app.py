@@ -1,6 +1,6 @@
 import streamlit as st
 from auth import check_session, logout
-from pages.dashboard import dashboard_show as dashboard
+import pages.dashboard as dashboard
 import pages.login as login
 import pages.helpdesk as helpdesk
 
