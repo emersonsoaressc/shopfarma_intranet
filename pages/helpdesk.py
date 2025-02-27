@@ -24,11 +24,11 @@ def show():
                 
                 if user_data["cargo"] in ["COO", "Assistente"]:
                     novo_status = st.selectbox(
-                        "Atualizar Status", 
+                        f"Atualizar Status ({ticket['titulo']})", 
                         ["Aberto", "Em andamento", "Concluído"], 
                         index=["Aberto", "Em andamento", "Concluído"].index(ticket["status"])
                     )
-                    if st.button(f"Atualizar {ticket['titulo']}"):
+                    if st.button(f"✅ Atualizar {ticket['titulo']}", key=f"update_{ticket['id']}"):
                         update_ticket_status(ticket["id"], novo_status)
                         st.success(f"✅ Status atualizado para {novo_status}")
                         st.experimental_rerun()

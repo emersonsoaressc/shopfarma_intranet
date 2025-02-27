@@ -1,13 +1,14 @@
 import firebase_admin
 from firebase_admin import credentials, firestore
 import streamlit as st
+from schemas import USER_SCHEMA, TICKET_SCHEMA, validate_schema
 
 # 🔹 Carregar credenciais do Firebase do Streamlit Secrets
 firebase_secrets = {
     "type": st.secrets["FIREBASE"]["type"],
     "project_id": st.secrets["FIREBASE"]["project_id"],
     "private_key_id": st.secrets["FIREBASE"]["private_key_id"],
-    "private_key": st.secrets["FIREBASE"]["private_key"].replace('\\n', '\n'),  # Corrigindo quebra de linha
+    "private_key": st.secrets["FIREBASE"]["private_key"].replace('\\n', '\n'),  
     "client_email": st.secrets["FIREBASE"]["client_email"],
     "client_id": st.secrets["FIREBASE"]["client_id"],
     "auth_uri": st.secrets["FIREBASE"]["auth_uri"],
@@ -25,91 +26,65 @@ if not firebase_admin._apps:
 # 🔹 Conectar ao Firestore
 db = firestore.client()
 
-
-
 # -------------------------- [ USUÁRIOS ] --------------------------
-
-def create_default_coo():
-    """Cria um usuário padrão COO no Firebase se ainda não existir"""
-    users_ref = db.collection("usuarios").document("emerson.soares.sc@gmail.com")
-    if not users_ref.get().exists:
-        users_ref.set({
-            "nome": "Emerson Gustavo da Silva Soares",
-            "email": "emerson.soares.sc@gmail.com",
-            "senha": "admin123",  # 🔹 Idealmente, criptografar isso depois!
-            "cargo": "Diretor de Operações (COO)",
-            "loja": None,
-            "whatsapp": "+5548984876012",
-            "aprovado": True  # COO já está aprovado por padrão
-        })
 
 def create_user(nome, email, senha, cargo, loja, whatsapp):
     """Cadastra um novo usuário no Firestore"""
-    doc_ref = db.collection("usuarios").document(email)
-    doc_ref.set({
+    user_data = {
         "nome": nome,
         "email": email,
-        "senha": senha,  # 🔹 Armazene as senhas de forma segura (hash no futuro)
+        "senha": senha,  # 🔹 Melhorar segurança depois
         "cargo": cargo,
         "loja": loja,
         "whatsapp": whatsapp,
-        "aprovado": False  # Usuário precisa ser aprovado pelo COO
-    })
+        "aprovado": False
+    }
+    
+    if not validate_schema(user_data, USER_SCHEMA):
+        raise ValueError("Os dados do usuário não correspondem ao esquema definido.")
+
+    doc_ref = db.collection("usuarios").document(email)
+    doc_ref.set(user_data)
     return True
 
-def get_user(email, senha):
+def get_user(email):
     """Retorna um usuário se ele existir e estiver aprovado"""
     doc = db.collection("usuarios").document(email).get()
     if doc.exists:
-        user_data = doc.to_dict()
-        if user_data["senha"] == senha and user_data["aprovado"]:
-            return user_data
+        return doc.to_dict()
     return None
 
 def get_pending_users():
-    """Retorna usuários que precisam ser aprovados"""
+    """Retorna usuários pendentes de aprovação"""
     users = db.collection("usuarios").where("aprovado", "==", False).stream()
     return [user.to_dict() for user in users]
 
 def approve_user(email):
-    """Aprova um usuário no sistema e verifica se existe antes"""
+    """Aprova um usuário se ele existir"""
     user_ref = db.collection("usuarios").document(email)
-    
-    # Verifica se o documento realmente existe
-    user_doc = user_ref.get()
-    
-    if user_doc.exists:
-        user_ref.update({"aprovado": False})
-        return True  # Indica que a aprovação foi bem-sucedida
-    else:
-        return False  # Indica que o usuário não foi encontrado
-
-
-
-def update_user(email, nome, cargo, loja, whatsapp):
-    """Atualiza os dados de um usuário antes da aprovação"""
-    user_ref = db.collection("usuarios").document(email)
-    user_ref.update({
-        "nome": nome,
-        "cargo": cargo,
-        "loja": loja,
-        "whatsapp": whatsapp
-    })
-
+    if user_ref.get().exists:
+        user_ref.update({"aprovado": True})
+        return True
+    return False
 
 # -------------------------- [ HELP DESK ] --------------------------
 
 def create_ticket(usuario_id, titulo, descricao, categoria, urgencia="Média"):
     """Cria um novo chamado no Firestore"""
-    doc_ref = db.collection("chamados").document()
-    doc_ref.set({
+    ticket_data = {
         "titulo": titulo,
         "descricao": descricao,
         "categoria": categoria,
         "urgencia": urgencia,
         "status": "Aberto",
         "usuario_id": usuario_id
-    })
+    }
+    
+    if not validate_schema(ticket_data, TICKET_SCHEMA):
+        raise ValueError("Os dados do chamado não correspondem ao esquema definido.")
+
+    doc_ref = db.collection("chamados").document()
+    doc_ref.set(ticket_data)
 
 def get_user_tickets(usuario_id):
     """Retorna os chamados de um usuário"""
