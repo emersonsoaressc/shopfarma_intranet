@@ -69,10 +69,13 @@ def get_user(email, senha):
 def approve_user(email):
     """Aprova um usuário alterando seu status no Firestore."""
     user_ref = db.collection("usuarios").document(email)
-    if user_ref.get().exists:
-        user_ref.update({"status": "Aprovado"})
+    user_doc = user_ref.get()
+
+    if user_doc.exists:
+        user_ref.update({"aprovado": True})  # Atualiza o campo 'aprovado' para True
         return True
     return False
+.
 
 def get_pending_users():
     """Retorna usuários que ainda não foram aprovados."""
