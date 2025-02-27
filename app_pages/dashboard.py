@@ -69,19 +69,3 @@ def show():
 
     st.markdown("---")
     
-    
-    # 🆘 Helpdesk
-    st.subheader("🆘 Meus Chamados")
-    chamados = get_user_tickets(user["email"])
-
-    if not chamados:
-        st.info("Nenhum chamado aberto.")
-    else:
-        for chamado in chamados:
-            with st.expander(f"📌 {chamado['titulo']} ({chamado['status']})"):
-                st.write(f"**Descrição:** {chamado['descricao']}")
-                #st.write(f"📅 **Data:** {chamado['data']}")
-
-    # 📩 Botão para abrir novo chamado
-    if st.button("📩 Abrir Novo Chamado no Helpdesk"):
-        st.session_state.current_page = "helpdesk"
