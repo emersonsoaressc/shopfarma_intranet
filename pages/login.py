@@ -2,7 +2,7 @@ import streamlit as st
 from database import create_user, get_user
 import time
 
-def show():
+def login_show():
     """Exibe a tela de login e cadastro."""
 
     # Verifica se o usuário quer se cadastrar

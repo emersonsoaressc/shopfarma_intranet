@@ -2,7 +2,7 @@ import streamlit as st
 from database import create_ticket, get_user_tickets, update_ticket_status
 from auth import check_session
 
-def show():
+def helpdesk_show():
     """Exibe a página do Helpdesk"""
     user_data = check_session()
 
