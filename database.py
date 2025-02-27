@@ -57,7 +57,7 @@ def create_user(nome, email, senha, cargo, loja, whatsapp):
 def get_user(email, senha):
     """Busca um usuário no Firestore com base no e-mail e senha."""
     users_ref = db.collection("usuarios")
-    query = users_ref.where(filter=("email", "==", email)).stream()  # ✅ Correção do WARNING
+    query = users_ref.where("email", "==", email).stream()  # 🔹 CORRIGIDO
 
     for doc in query:
         user = doc.to_dict()
@@ -76,7 +76,7 @@ def approve_user(email):
 
 def get_pending_users():
     """Retorna todos os usuários pendentes de aprovação."""
-    users = db.collection("usuarios").where(filter=("status", "==", "Pendente")).stream()
+    users = db.collection("usuarios").where("status", "==", "Pendente").stream()  # 🔹 CORRIGIDO
     return [{"id": user.id, **user.to_dict()} for user in users]
 
 # -------------------------- [ HELP DESK ] --------------------------
@@ -118,7 +118,7 @@ def create_ticket(usuario_id, titulo, descricao, categoria, urgencia="Média", l
 
 def get_user_tickets(usuario_id):
     """Retorna os chamados de um usuário."""
-    tickets = db.collection("chamados").where(filter=("usuario_id", "==", usuario_id)).stream()  # ✅ Correção do WARNING
+    tickets = db.collection("chamados").where("usuario_id", "==", usuario_id).stream()  # 🔹 CORRIGIDO
     return [{"id": ticket.id, **ticket.to_dict()} for ticket in tickets]
 
 def update_ticket_status(ticket_id, new_status, usuario_id, responsaveis=None):
@@ -164,5 +164,5 @@ def upload_file(ticket_id, file_type, file_url, usuario_id):
 
 def get_pending_tickets():
     """Retorna todos os chamados que ainda não foram finalizados."""
-    tickets = db.collection("chamados").where(filter=("status", "!=", "Chamado finalizado")).stream()  # ✅ Correção do WARNING
+    tickets = db.collection("chamados").where("status", "!=", "Chamado finalizado").stream()  # 🔹 CORRIGIDO
     return [{"id": ticket.id, **ticket.to_dict()} for ticket in tickets]
