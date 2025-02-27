@@ -65,7 +65,7 @@ def show():
                     if st.button(f"✅ Aprovar {usuario['nome']}", key=f"approve_{usuario['email']}"):
                         approve_user(usuario["email"])
                         st.success(f"✅ Usuário {usuario['nome']} aprovado com sucesso!")
-                        st.experimental_rerun()  # Atualiza a página após aprovação
+                        st.rerun()  # Atualiza a página após aprovação
 
     st.markdown("---")
     
