@@ -13,7 +13,8 @@ if "user" not in st.session_state or not st.session_state["user"]:
 st.sidebar.image('images/logo_shopfarma_sem_fundo.png', width=150)
 st.sidebar.markdown("---")
 user_data = st.session_state["user"]
-st.sidebar.markdown(f"👤 **Usuário:** {user_data.get('nome', 'Desconhecido')} ({user_data.get('cargo', 'Sem cargo')})")
+st.sidebar.markdown(f"👤 **Usuário:** {user_data.get('nome', 'Desconhecido')}")
+st.sidebar.markdown(f"📍 **Cargo:**({user_data.get('cargo', 'Sem cargo')})")
 st.sidebar.markdown("---")
 # Menus dinâmicos baseados no cargo
 menu = {
