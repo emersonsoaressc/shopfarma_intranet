@@ -1,7 +1,6 @@
 import streamlit as st
 from auth import check_session, logout
 from pages import login, dashboard, helpdesk
-from teste_firebase import teste_firebase
 
 # Configuração da página
 st.set_page_config(page_title="Shopfarma - Gestão", layout="wide")
@@ -26,4 +25,3 @@ else:
     if st.session_state.current_page in menu:
         menu[st.session_state.current_page]()
 
-teste_firebase()

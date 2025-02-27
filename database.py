@@ -9,6 +9,20 @@ firebase_admin.initialize_app(cred)
 db = firestore.client()
 
 # -------------------------- [ USUÁRIOS ] --------------------------
+def create_default_coo():
+    """Cria um usuário padrão COO no Firebase se ainda não existir"""
+    users_ref = db.collection("usuarios").document("admin@shopfarma.com")
+    if not users_ref.get().exists:
+        users_ref.set({
+            "nome": "Emerson Gustavo da Silva Soares",
+            "email": "emerson.soares.sc@gmail.com",
+            "senha": "admin123",  # 🔹 Idealmente, criptografar isso depois!
+            "cargo": "Diretor de Operações (COO)",
+            "loja": None,
+            "whatsapp": '+5548984876012',
+            "aprovado": True  # COO já está aprovado por padrão
+        })
+
 
 def create_user(nome, email, senha, cargo, loja, whatsapp):
     """Cadastra um novo usuário no Firestore"""
