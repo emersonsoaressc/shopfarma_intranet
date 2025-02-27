@@ -86,6 +86,7 @@ def update_user(email, nome, cargo, loja, whatsapp):
         "whatsapp": whatsapp
     })
 
+
 # -------------------------- [ HELP DESK ] --------------------------
 
 def create_ticket(usuario_id, titulo, descricao, categoria, urgencia="Média"):
