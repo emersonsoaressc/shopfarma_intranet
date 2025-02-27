@@ -2,6 +2,7 @@ import streamlit as st
 from auth import check_session, logout
 import pages.dashboard as dashboard
 import pages.login as login
+import pages.helpdesk as helpdesk
 
 # 🔹 Verifica se há usuário logado
 if "user" not in st.session_state or not st.session_state["user"]:
@@ -17,7 +18,7 @@ with st.sidebar:
     # Menus dinâmicos baseados no cargo
     menu = {
         "Dashboard": dashboard.show,
-        "Helpdesk": pages.helpdesk.show,
+        "Helpdesk": helpdesk.show,
         "Sair": logout
     }
     escolha = st.selectbox("📌 Opções", list(menu.keys()))
