@@ -40,6 +40,6 @@ def show():
             create_ticket(user_data["email"], titulo, descricao, categoria, urgencia, loja)
             st.success("✅ Chamado aberto com sucesso!")
             st.session_state["abrir_chamado"] = False  # Oculta o formulário após a criação
-            st.experimental_rerun()
+            st.rerun()
         else:
             st.warning("⚠️ Preencha todos os campos antes de criar um chamado.")
