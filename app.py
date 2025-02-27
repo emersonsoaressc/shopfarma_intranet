@@ -1,6 +1,5 @@
 import streamlit as st
 from auth import check_session
-import components.sidebar as sidebar
 import pages.dashboard as dashboard
 import pages.login as login
 
@@ -9,7 +8,6 @@ user_data = check_session()
 
 if user_data:
     st.session_state["user"] = user_data
-    sidebar.show()  # Só chama o sidebar se o usuário estiver logado
     dashboard.show()  # Carrega o dashboard após login
 else:
     login.show()  # Mostra a tela de login
