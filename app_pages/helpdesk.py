@@ -77,7 +77,7 @@ def show():
         open_ticket.show()  # Chama a função do novo arquivo open_ticket.py
 
 
-if st.button("🔍 Listar Todos os Chamados"):
-    chamados = get_all_tickets()
-    for chamado in chamados:
-        st.write(f"{chamado['titulo']} - {chamado['status']}")
+    if st.button("🔍 Listar Todos os Chamados"):
+        chamados = get_all_tickets()
+        for chamado in chamados:
+            st.write(f"{chamado['titulo']} - {chamado['status']}")
