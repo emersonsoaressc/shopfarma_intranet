@@ -2,6 +2,7 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 import streamlit as st
 import datetime
+import hashlib
 from schemas import USER_SCHEMA, TICKET_SCHEMA, validate_schema
 
 # 🔹 Carregar credenciais do Firebase do Streamlit Secrets
@@ -9,7 +10,7 @@ firebase_secrets = {
     "type": st.secrets["FIREBASE"]["type"],
     "project_id": st.secrets["FIREBASE"]["project_id"],
     "private_key_id": st.secrets["FIREBASE"]["private_key_id"],
-    "private_key": st.secrets["FIREBASE"]["private_key"].replace('\\n', '\n'),  
+    "private_key": st.secrets["FIREBASE"]["private_key"].replace('\\n', '\n'),
     "client_email": st.secrets["FIREBASE"]["client_email"],
     "client_id": st.secrets["FIREBASE"]["client_id"],
     "auth_uri": st.secrets["FIREBASE"]["auth_uri"],
@@ -29,6 +30,30 @@ db = firestore.client()
 
 # -------------------------- [ USUÁRIOS ] --------------------------
 
+def create_user(nome, email, senha, cargo, loja, whatsapp):
+    """Cria um novo usuário no Firestore com senha hash."""
+    users_ref = db.collection("usuarios").document(email)
+
+    if users_ref.get().exists:
+        return False  # Usuário já existe
+
+    hashed_password = hashlib.sha256(senha.encode()).hexdigest()
+    user_data = {
+        "nome": nome,
+        "email": email,
+        "senha": hashed_password,
+        "cargo": cargo,
+        "loja": loja,
+        "whatsapp": whatsapp,
+        "status": "Pendente"  # O usuário começa com status pendente até ser aprovado pelo COO
+    }
+
+    if not validate_schema(user_data, USER_SCHEMA):
+        raise ValueError("Os dados do usuário não correspondem ao esquema definido.")
+
+    users_ref.set(user_data)
+    return True
+
 def get_user(email, senha):
     """Busca um usuário no Firestore com base no e-mail e senha."""
     users_ref = db.collection("usuarios")
@@ -36,14 +61,23 @@ def get_user(email, senha):
 
     for doc in query:
         user = doc.to_dict()
-        if "senha" in user and user["senha"] == senha:
-            return user  
-    return None  
+        hashed_input_password = hashlib.sha256(senha.encode()).hexdigest()
+        if "senha" in user and user["senha"] == hashed_input_password:
+            return user
+    return None
+
+def approve_user(email):
+    """Aprova um usuário alterando seu status no Firestore."""
+    user_ref = db.collection("usuarios").document(email)
+    if user_ref.get().exists:
+        user_ref.update({"status": "Aprovado"})
+        return True
+    return False
 
 # -------------------------- [ HELP DESK ] --------------------------
 
 def create_ticket(usuario_id, titulo, descricao, categoria, urgencia="Média", loja="Matriz"):
-    """Cria um novo chamado no Firestore"""
+    """Cria um novo chamado no Firestore."""
     ticket_data = {
         "titulo": titulo,
         "descricao": descricao,
@@ -63,6 +97,11 @@ def create_ticket(usuario_id, titulo, descricao, categoria, urgencia="Média", l
             "orcamentos": [],
             "nota_fiscal": "",
             "boleto": ""
+        },
+        "responsaveis": {
+            "COO": "",
+            "Financeiro": "",
+            "CEO": "",
         }
     }
 
@@ -77,7 +116,7 @@ def get_user_tickets(usuario_id):
     tickets = db.collection("chamados").where("usuario_id", "==", usuario_id).stream()
     return [{"id": ticket.id, **ticket.to_dict()} for ticket in tickets]
 
-def update_ticket_status(ticket_id, new_status, usuario_id):
+def update_ticket_status(ticket_id, new_status, usuario_id, responsaveis=None):
     """Atualiza o status de um chamado e registra no histórico"""
     ticket_ref = db.collection("chamados").document(ticket_id)
     ticket = ticket_ref.get()
@@ -90,6 +129,10 @@ def update_ticket_status(ticket_id, new_status, usuario_id):
             "responsavel": usuario_id,
             "data_hora": datetime.datetime.utcnow().isoformat()
         })
+
+        if responsaveis:
+            ticket_data["responsaveis"].update(responsaveis)
+
         ticket_ref.update(ticket_data)
 
 def upload_file(ticket_id, file_type, file_url, usuario_id):
@@ -112,4 +155,5 @@ def upload_file(ticket_id, file_type, file_url, usuario_id):
             "data_hora": datetime.datetime.utcnow().isoformat()
         })
 
-        ticket_ref.update(ticket_data) 
+        ticket_ref.update(ticket_data)
+
