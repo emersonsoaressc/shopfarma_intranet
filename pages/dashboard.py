@@ -2,10 +2,12 @@ import streamlit as st
 from database import get_pending_users, approve_user
 
 def show():
-    # 🔹 Inicializa session_state["current_page"] se não existir
-    if "current_page" not in st.session_state:
-        st.session_state["current_page"] = "dashboard"
+    # 🔹 Evita que o conteúdo seja renderizado mais de uma vez
+    if "dashboard_loaded" in st.session_state:
+        return
+    st.session_state["dashboard_loaded"] = True
 
+    # 🔹 Título principal do dashboard
     st.title("📊 Dashboard - Gestão de Usuários")
 
     # 🔹 Exibir informações do usuário logado
@@ -15,15 +17,6 @@ def show():
     else:
         st.error("⚠️ Usuário não autenticado. Faça login novamente.")
         st.stop()
-
-    # 🔹 Garante que a sidebar seja exibida apenas uma vez
-    if "sidebar_loaded" not in st.session_state:
-        with st.sidebar:
-            st.title("📌 Opções")
-            if st.button("🔄 Logout", key="logout_sidebar_button"):
-                st.session_state.clear()
-                st.experimental_rerun()
-        st.session_state["sidebar_loaded"] = True  # 🔹 Marcar que já foi carregado
 
     # 🔹 Somente o COO pode aprovar usuários
     if user_data.get("cargo") == "Diretor de Operações (COO)":
@@ -48,6 +41,5 @@ def show():
                         approve_user(user["email"])
                         st.success(f"✅ Usuário {user['nome']} aprovado com sucesso!")
                         st.experimental_rerun()  # Atualiza a página após aprovação
-
     else:
         st.warning("🔒 Apenas o Diretor de Operações (COO) pode aprovar cadastros.")
