@@ -1,5 +1,5 @@
 import streamlit as st
-from database import get_user_tickets, update_ticket_status, get_pending_tickets
+from database import get_user_tickets, update_ticket_status, get_pending_tickets, get_all_tickets
 from auth import check_session
 import app_pages.open_ticket as open_ticket  # Importa o novo arquivo para abertura de chamados
 
@@ -75,3 +75,9 @@ def show():
     # 🔹 Exibir formulário somente se o botão for pressionado
     if st.session_state.get("abrir_chamado", False):
         open_ticket.show()  # Chama a função do novo arquivo open_ticket.py
+
+
+if st.button("🔍 Listar Todos os Chamados"):
+    chamados = get_all_tickets()
+    for chamado in chamados:
+        st.write(f"{chamado['titulo']} - {chamado['status']}")

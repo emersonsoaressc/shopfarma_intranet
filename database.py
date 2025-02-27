@@ -166,3 +166,12 @@ def get_pending_tickets(status="Pendente"):
     """Retorna todos os chamados com o status especificado."""
     tickets = db.collection("chamados").where("status", "==", status).stream()
     return [{"id": ticket.id, **ticket.to_dict()} for ticket in tickets]
+
+def get_all_tickets():
+    """Retorna TODOS os chamados (para testar se há dados no Firestore)"""
+    tickets_ref = db.collection("chamados").stream()
+    chamados = [{"id": ticket.id, **ticket.to_dict()} for ticket in tickets]
+    
+    print(f"📋 Todos os chamados: {chamados}")  # Debug no terminal
+    
+    return chamados
