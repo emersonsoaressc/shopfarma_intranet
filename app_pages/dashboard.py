@@ -17,10 +17,10 @@ def show():
     st.markdown(f"🏬 **Loja:** {user.get('loja', 'Não informado')}")
     st.markdown("---")
 
+    """
     # 📌 📊 Exibir cards diferentes por cargo 📊 📌
     cols1, cols2, cols3 = st.columns(3)
 
-    """  
     if user["cargo"] == "Diretor de Operações (COO)":
         st.subheader("📊 Indicadores da Rede")
         with cols1:
@@ -43,10 +43,11 @@ def show():
 
     else:
         st.info("⚠️ Nenhum dashboard disponível para este cargo.")
-    """
+    
 
     st.markdown("---")
-
+    """
+    
     # 🆘 Helpdesk
     st.subheader("🆘 Meus Chamados")
     chamados = get_user_tickets(user["email"])
