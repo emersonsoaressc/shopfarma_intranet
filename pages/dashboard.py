@@ -26,13 +26,16 @@ def show():
         if not pending_users:
             st.success("✅ Nenhum usuário pendente para aprovação no momento.")
         else:
-            for user in pending_users:
+            for i, user in enumerate(pending_users):  # 🔹 Enumera para gerar chaves únicas
                 with st.expander(f"📌 {user['nome']} ({user['email']})"):
                     st.write(f"📍 **Cargo:** {user['cargo']}")
                     st.write(f"🏬 **Loja:** {user['loja']}")
                     st.write(f"📞 **WhatsApp:** {user['whatsapp']}")
 
-                    if st.button(f"✅ Aprovar {user['email']}", key=user["email"]):
+                    # 🔹 Criando um identificador único para cada botão
+                    approve_key = f"approve_{i}_{user['email']}"
+
+                    if st.button(f"✅ Aprovar {user['email']}", key=approve_key):
                         approve_user(user["email"])
                         st.success(f"✅ Usuário {user['nome']} aprovado com sucesso!")
                         st.experimental_rerun()  # Atualiza a página após aprovação
