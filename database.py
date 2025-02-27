@@ -79,7 +79,7 @@ def approve_user(email):
     user_doc = user_ref.get()
     
     if user_doc.exists:
-        user_ref.update({"aprovado": True})
+        user_ref.update({"aprovado": False})
         return True  # Indica que a aprovação foi bem-sucedida
     else:
         return False  # Indica que o usuário não foi encontrado
