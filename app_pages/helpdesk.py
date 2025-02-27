@@ -54,7 +54,7 @@ def show():
                     if st.button(f"✅ Aprovar {chamado['titulo']}", key=f"approve_{chamado['id']}"):
                         update_ticket_status(chamado["id"], "Aprovado pelo COO", user_data["email"])
                         st.success(f"✅ Chamado {chamado['titulo']} aprovado!")
-                        st.experimental_rerun()
+                        st.rerun()
         else:
             st.success("✅ Nenhum chamado pendente no momento.")
             
