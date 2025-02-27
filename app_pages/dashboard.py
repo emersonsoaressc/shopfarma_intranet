@@ -18,11 +18,16 @@ def show():
     st.markdown("---")
 
     # 📌 📊 Exibir cards diferentes por cargo 📊 📌
+    cols1, cols2, cols3 = st.columns(3)
+    
     if user["cargo"] == "Diretor de Operações (COO)":
         st.subheader("📊 Indicadores da Rede")
-        st.metric("Vendas Totais", "R$ 1.250.000", "+15%")
-        st.metric("Clientes Atendidos", "8.500", "+5%")
-        st.metric("Chamados em Aberto", "3", "-10%")
+        with cols1:
+            st.metric("Vendas Totais", "R$ 1.250.000", "+15%")
+        with cols2:
+            st.metric("Clientes Atendidos", "8.500", "+5%")
+        with cols3:
+            st.metric("Chamados em Aberto", "3", "-10%")
 
     elif user["cargo"] == "Gerente de Loja":
         st.subheader("📊 Indicadores da Loja")
