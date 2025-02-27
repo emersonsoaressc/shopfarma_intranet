@@ -76,6 +76,16 @@ def approve_user(email):
     user_ref = db.collection("usuarios").document(email)
     user_ref.update({"aprovado": True})
 
+def update_user(email, nome, cargo, loja, whatsapp):
+    """Atualiza os dados de um usuário antes da aprovação"""
+    user_ref = db.collection("usuarios").document(email)
+    user_ref.update({
+        "nome": nome,
+        "cargo": cargo,
+        "loja": loja,
+        "whatsapp": whatsapp
+    })
+
 # -------------------------- [ HELP DESK ] --------------------------
 
 def create_ticket(usuario_id, titulo, descricao, categoria, urgencia="Média"):
