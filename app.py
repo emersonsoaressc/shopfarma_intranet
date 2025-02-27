@@ -11,9 +11,10 @@ if "user" not in st.session_state or not st.session_state["user"]:
 
 # 🔹 Somente exibe a sidebar SE o usuário estiver logado
 st.sidebar.image('images/logo_shopfarma_sem_fundo.png', width=150)
+st.markdown("---")
 user_data = st.session_state["user"]
 st.sidebar.markdown(f"👤 **Usuário:** {user_data.get('nome', 'Desconhecido')} ({user_data.get('cargo', 'Sem cargo')})")
-
+st.markdown("---")
 # Menus dinâmicos baseados no cargo
 menu = {
     "Dashboard": dashboard.show,
