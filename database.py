@@ -157,3 +157,7 @@ def upload_file(ticket_id, file_type, file_url, usuario_id):
 
         ticket_ref.update(ticket_data)
 
+def get_pending_tickets():
+    """Retorna todos os chamados que ainda não foram finalizados"""
+    tickets = db.collection("chamados").where("status", "!=", "Chamado finalizado").stream()
+    return [{"id": ticket.id, **ticket.to_dict()} for ticket in tickets]
