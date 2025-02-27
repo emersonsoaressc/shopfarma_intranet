@@ -20,11 +20,11 @@ def hash_password(password):
 # -------------------------- [ USUÁRIOS ] --------------------------
 def create_default_coo():
     """Cria um usuário padrão COO no Firebase se ainda não existir"""
-    users_ref = db.collection("usuarios").document("admin@shopfarma.com")
+    users_ref = db.collection("usuarios").document("emerson.soares.sc@gmail.com")
     if not users_ref.get().exists:
         users_ref.set({
             "nome": "Emerson Gustavo da Silva Soares",
-            "email": "admin@shopfarma.com",
+            "email": "emerson.soares.sc@gmail.com",
             "senha": hash_password("admin123"),  # 🔹 Senha criptografada
             "cargo": "Diretor de Operações (COO)",
             "loja": None,
