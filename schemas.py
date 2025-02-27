@@ -1,3 +1,7 @@
+from datetime import datetime
+
+
+
 USER_SCHEMA = {
     "nome": str,
     "email": str,
@@ -34,3 +38,25 @@ def validate_schema(data, schema):
             else:
                 return False
     return True
+
+
+
+
+def novo_chamado(titulo, descricao, loja, usuario):
+    """Retorna um dicionário com a estrutura de um chamado."""
+    return {
+        "titulo": titulo,
+        "descricao": descricao,
+        "loja": loja,
+        "status": "Aberto",
+        "historico": [
+            {"status": "Aberto", "usuario": usuario, "data_hora": datetime.now().isoformat()}
+        ],
+        "necessita_orcamento": False,
+        "orcamentos": [],
+        "nota_fiscal": None,
+        "boleto": None,
+        "usuario_abriu": usuario,
+        "data_abertura": datetime.now().isoformat(),
+        "responsavel_atual": "COO"
+    }
