@@ -72,9 +72,23 @@ def get_pending_users():
     return [user.to_dict() for user in users]
 
 def approve_user(email):
-    """Aprova um usuário no sistema"""
+    """Aprova um usuário no banco de dados."""
     user_ref = db.collection("usuarios").document(email)
-    user_ref.update({"aprovado": True})
+
+    # 🔹 Verifica se o usuário realmente existe antes de tentar atualizar
+    user = user_ref.get()
+    if not user.exists:
+        print(f"❌ Erro: Usuário {email} não encontrado no banco de dados!")
+        return False
+
+    try:
+        user_ref.update({"aprovado": True})
+        print(f"✅ Usuário {email} aprovado com sucesso!")
+        return True
+    except Exception as e:
+        print(f"⚠️ Erro ao aprovar usuário {email}: {e}")
+        return False
+
 
 def update_user(email, nome, cargo, loja, whatsapp):
     """Atualiza os dados de um usuário antes da aprovação"""
