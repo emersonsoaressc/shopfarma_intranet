@@ -1,7 +1,7 @@
 import streamlit as st
 from database import get_user_tickets, update_ticket_status, get_pending_tickets
 from auth import check_session
-import open_ticket  # Importa o novo arquivo para abertura de chamados
+import app_pages.open_ticket as open_ticket  # Importa o novo arquivo para abertura de chamados
 
 def show():
     """Exibe a página do Helpdesk"""
