@@ -16,34 +16,36 @@ def show():
         st.error("⚠️ Usuário não autenticado. Faça login novamente.")
         st.stop()
 
-    # 🔹 Verifica se o usuário tem permissão para aprovar cadastros
+    # 🔹 Menu lateral (removido botão duplicado!)
+    with st.sidebar:
+        st.title("📌 Opções")
+        if st.button("🔄 Logout", key="logout_sidebar"):
+            st.session_state.clear()
+            st.experimental_rerun()
+
+    # 🔹 Somente o COO pode aprovar usuários
     if user_data.get("cargo") == "Diretor de Operações (COO)":
         st.subheader("📝 Aprovação de Usuários")
-        
+
         # Buscar usuários pendentes
         pending_users = get_pending_users()
 
         if not pending_users:
             st.success("✅ Nenhum usuário pendente para aprovação no momento.")
         else:
-            for i, user in enumerate(pending_users):  # 🔹 Enumera para gerar chaves únicas
+            for user in pending_users:
                 with st.expander(f"📌 {user['nome']} ({user['email']})"):
                     st.write(f"📍 **Cargo:** {user['cargo']}")
                     st.write(f"🏬 **Loja:** {user['loja']}")
                     st.write(f"📞 **WhatsApp:** {user['whatsapp']}")
 
                     # 🔹 Criando um identificador único para cada botão
-                    approve_key = f"approve_{i}_{user['email']}"
+                    approve_key = f"approve_{user['email']}"
 
                     if st.button(f"✅ Aprovar {user['email']}", key=approve_key):
                         approve_user(user["email"])
                         st.success(f"✅ Usuário {user['nome']} aprovado com sucesso!")
                         st.experimental_rerun()  # Atualiza a página após aprovação
+
     else:
         st.warning("🔒 Apenas o Diretor de Operações (COO) pode aprovar cadastros.")
-
-    # 🔹 Menu lateral para logout
-    st.sidebar.title("📌 Opções")
-    if st.sidebar.button("🔄 Logout", key="logout"):
-        st.session_state.clear()
-        st.experimental_rerun()
