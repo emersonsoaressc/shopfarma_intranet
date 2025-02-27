@@ -1,11 +1,12 @@
 import streamlit as st
+from database import get_pending_users, approve_user
 
 def show():
     # 🔹 Inicializa session_state["current_page"] se não existir
     if "current_page" not in st.session_state:
-        st.session_state["current_page"] = "dashboard"  # Define o valor padrão
+        st.session_state["current_page"] = "dashboard"
 
-    st.title("📊 Dashboard Principal")
+    st.title("📊 Dashboard - Gestão de Usuários")
 
     # 🔹 Exibir informações do usuário logado
     if "user" in st.session_state and st.session_state["user"]:
@@ -15,36 +16,28 @@ def show():
         st.error("⚠️ Usuário não autenticado. Faça login novamente.")
         st.stop()
 
-    # 🔹 Criar botões para navegação entre as páginas
-    col1, col2, col3 = st.columns(3)
+    # 🔹 Verifica se o usuário tem permissão para aprovar cadastros
+    if user_data.get("cargo") == "Diretor de Operações (COO)":
+        st.subheader("📝 Aprovação de Usuários")
+        
+        # Buscar usuários pendentes
+        pending_users = get_pending_users()
 
-    with col1:
-        estoque_btn = st.button("📦 Gestão de Estoque", key="btn_estoque")
-    with col2:
-        colaboradores_btn = st.button("👥 Gestão de Colaboradores", key="btn_colaboradores")
-    with col3:
-        helpdesk_btn = st.button("🛠️ Helpdesk", key="btn_helpdesk")
+        if not pending_users:
+            st.success("✅ Nenhum usuário pendente para aprovação no momento.")
+        else:
+            for user in pending_users:
+                with st.expander(f"📌 {user['nome']} ({user['email']})"):
+                    st.write(f"📍 **Cargo:** {user['cargo']}")
+                    st.write(f"🏬 **Loja:** {user['loja']}")
+                    st.write(f"📞 **WhatsApp:** {user['whatsapp']}")
 
-    # 🔹 Atualiza a página com base na escolha do botão
-    if estoque_btn:
-        st.session_state["current_page"] = "estoque"
-    elif colaboradores_btn:
-        st.session_state["current_page"] = "colaboradores"
-    elif helpdesk_btn:
-        st.session_state["current_page"] = "helpdesk"
-
-    # 🔹 Exibir conteúdos das páginas selecionadas dinamicamente
-    if st.session_state["current_page"] == "estoque":
-        st.subheader("📦 Gestão de Estoque")
-        st.write("Aqui ficará a funcionalidade de gestão de estoque.")
-
-    elif st.session_state["current_page"] == "colaboradores":
-        st.subheader("👥 Gestão de Colaboradores")
-        st.write("Aqui ficará a funcionalidade de gestão de colaboradores.")
-
-    elif st.session_state["current_page"] == "helpdesk":
-        st.subheader("🛠️ Helpdesk")
-        st.write("Aqui ficará o sistema de suporte interno.")
+                    if st.button(f"✅ Aprovar {user['email']}", key=user["email"]):
+                        approve_user(user["email"])
+                        st.success(f"✅ Usuário {user['nome']} aprovado com sucesso!")
+                        st.experimental_rerun()  # Atualiza a página após aprovação
+    else:
+        st.warning("🔒 Apenas o Diretor de Operações (COO) pode aprovar cadastros.")
 
     # 🔹 Menu lateral para logout
     st.sidebar.title("📌 Opções")
