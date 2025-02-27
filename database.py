@@ -75,7 +75,7 @@ def approve_user(email):
         user_ref.update({"aprovado": True})  # Atualiza o campo 'aprovado' para True
         return True
     return False
-.
+
 
 def get_pending_users():
     """Retorna usuários que ainda não foram aprovados."""
