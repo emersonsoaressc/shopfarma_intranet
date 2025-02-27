@@ -1,50 +1,57 @@
 import streamlit as st
-from database import get_pending_users, approve_user
+from database import get_user_tickets  # Para listar chamados do Helpdesk
 
 def show():
-    # 🔹 Evita que o conteúdo seja renderizado mais de uma vez
-    if "dashboard_loaded" in st.session_state:
-        return
-    st.session_state["dashboard_loaded"] = True
+    st.title("📊 Dashboard - Gestão Interna")
 
-    # 🔹 Título principal do dashboard
-    st.title("📊 Dashboard - Gestão de Usuários")
-
-    # 🔹 Exibir informações do usuário logado
-    if "user" in st.session_state and st.session_state["user"]:
-        user_data = st.session_state["user"]
-        st.markdown(f"👤 **Usuário:** {user_data.get('nome', 'Desconhecido')} ({user_data.get('cargo', 'Sem cargo')})")
-    else:
-        st.error("⚠️ Usuário não autenticado. Faça login novamente.")
+    # Verifica se o usuário está logado
+    if "user" not in st.session_state:
+        st.error("⚠️ Você precisa estar logado para acessar o sistema.")
         st.stop()
 
-    # 🔹 Somente o COO pode aprovar usuários
-    if user_data.get("cargo") == "Diretor de Operações (COO)":
-        st.subheader("📝 Aprovação de Usuários")
+    user = st.session_state["user"]
 
-        # Buscar usuários pendentes
-        pending_users = get_pending_users()
+    # Exibir informações básicas do usuário
+    st.markdown(f"👤 **Usuário:** {user.get('nome', 'Não informado')}")
+    st.markdown(f"📍 **Cargo:** {user.get('cargo', 'Não informado')}")
+    st.markdown(f"🏬 **Loja:** {user.get('loja', 'Não informado')}")
+    st.markdown("---")
 
-        if not pending_users:
-            st.success("✅ Nenhum usuário pendente para aprovação no momento.")
-        else:
-            for user in pending_users:
-                with st.expander(f"📌 {user['nome']} ({user['email']})"):
-                    st.write(f"📍 **Cargo:** {user['cargo']}")
-                    st.write(f"🏬 **Loja:** {user['loja']}")
-                    st.write(f"📞 **WhatsApp:** {user['whatsapp']}")
+    # 📌 📊 Exibir cards diferentes por cargo 📊 📌
+    if user["cargo"] == "Diretor de Operações (COO)":
+        st.subheader("📊 Indicadores da Rede")
+        st.metric("Vendas Totais", "R$ 1.250.000", "+15%")
+        st.metric("Clientes Atendidos", "8.500", "+5%")
+        st.metric("Chamados em Aberto", "3", "-10%")
 
-                    # 🔹 Criando um identificador único para cada botão
-                    approve_key = f"approve_{user['email']}"
+    elif user["cargo"] == "Gerente de Loja":
+        st.subheader("📊 Indicadores da Loja")
+        st.metric("Faturamento do Mês", "R$ 120.000", "+8%")
+        st.metric("Clientes Atendidos", "900", "+3%")
+        st.metric("Estoque Baixo", "5 produtos", "🚨")
 
-                    if st.button(f"✅ Aprovar {user['email']}", key=approve_key):
-                        sucesso = approve_user(user["email"])
-                        
-                        if sucesso:
-                            st.success(f"✅ Usuário {user['nome']} aprovado com sucesso!")
-                            st.experimental_rerun()  # Atualiza a página após aprovação
-                        else:
-                            st.error(f"❌ Erro: Usuário {user['email']} não encontrado no Firestore!")
+    elif user["cargo"] == "Atendente":
+        st.subheader("📊 Minhas Metas")
+        st.metric("Vendas Realizadas", "75", "+10%")
+        st.metric("Clientes Atendidos", "320", "+6%")
 
     else:
-        st.warning("🔒 Apenas o Diretor de Operações (COO) pode aprovar cadastros.")
+        st.info("⚠️ Nenhum dashboard disponível para este cargo.")
+
+    st.markdown("---")
+
+    # 🆘 Helpdesk
+    st.subheader("🆘 Meus Chamados")
+    chamados = get_user_tickets(user["email"])
+
+    if not chamados:
+        st.info("Nenhum chamado aberto.")
+    else:
+        for chamado in chamados:
+            with st.expander(f"📌 {chamado['titulo']} ({chamado['status']})"):
+                st.write(f"**Descrição:** {chamado['descricao']}")
+                st.write(f"📅 **Data:** {chamado['data']}")
+
+    # 📩 Botão para abrir novo chamado
+    if st.button("📩 Abrir Novo Chamado no Helpdesk"):
+        st.session_state.current_page = "helpdesk"
