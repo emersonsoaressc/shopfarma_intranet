@@ -50,7 +50,7 @@ def show():
         for chamado in chamados:
             with st.expander(f"📌 {chamado['titulo']} ({chamado['status']})"):
                 st.write(f"**Descrição:** {chamado['descricao']}")
-                st.write(f"📅 **Data:** {chamado['data']}")
+                #st.write(f"📅 **Data:** {chamado['data']}")
 
     # 📩 Botão para abrir novo chamado
     if st.button("📩 Abrir Novo Chamado no Helpdesk"):
