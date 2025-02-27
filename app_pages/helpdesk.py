@@ -19,7 +19,7 @@ def show():
 
     if tickets:
         for ticket in tickets:
-            with st.expander(f"📌 {ticket['loja']} - {chamado['titulo']} - {chamado['status']}"):
+            with st.expander(f"{ticket['loja']} - {ticket['titulo']} - {ticket['status']}"):
                 st.write(f"**Descrição:** {ticket['descricao']}")
                 st.write(f"**Categoria:** {ticket['categoria']}")
                 st.write(f"**Urgência:** {ticket['urgencia']}")
