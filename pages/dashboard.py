@@ -38,8 +38,13 @@ def show():
                     approve_key = f"approve_{user['email']}"
 
                     if st.button(f"✅ Aprovar {user['email']}", key=approve_key):
-                        approve_user(user["email"])
-                        st.success(f"✅ Usuário {user['nome']} aprovado com sucesso!")
-                        st.experimental_rerun()  # Atualiza a página após aprovação
+                        sucesso = approve_user(user["email"])
+                        
+                        if sucesso:
+                            st.success(f"✅ Usuário {user['nome']} aprovado com sucesso!")
+                            st.experimental_rerun()  # Atualiza a página após aprovação
+                        else:
+                            st.error(f"❌ Erro: Usuário {user['email']} não encontrado no Firestore!")
+
     else:
         st.warning("🔒 Apenas o Diretor de Operações (COO) pode aprovar cadastros.")
