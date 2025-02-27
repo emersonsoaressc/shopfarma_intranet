@@ -1,39 +1,50 @@
 import streamlit as st
-from auth import check_session, logout
 
 def show():
-    """Exibe a dashboard principal"""
-    user_data = check_session()
+    # 🔹 Garantir que "current_page" existe no session_state
+    if "current_page" not in st.session_state:
+        st.session_state["current_page"] = "dashboard"  # Página inicial padrão
 
-    if not user_data:
-        st.warning("⚠️ Você precisa estar logado.")
-        return
+    st.title("📊 Dashboard Principal")
 
-    st.image('images/logo_shopfarma_sem_fundo.png', width=250)
-    st.markdown(f"### 👤 Bem-vindo, {user_data['nome']} ({user_data['cargo']})")
+    # 🔹 Exibir informações do usuário logado
+    if "user" in st.session_state:
+        user_data = st.session_state["user"]
+        st.markdown(f"👤 **Usuário:** {user_data['nome']} ({user_data['cargo']})")
 
-    col1, col2, col3, col4 = st.columns(4)
+    # 🔹 Layout dos cards principais
+    col1, col2, col3 = st.columns(3)
 
     with col1:
-        if user_data["cargo"] in ["COO", "Gestor"]:
-            if st.button("🛒 Gestão de Estoque"):
-                st.session_state.current_page = "estoque"
+        if st.button("📦 Gestão de Estoque"):
+            st.session_state["current_page"] = "estoque"
+            st.experimental_rerun()
 
     with col2:
-        if user_data["cargo"] in ["COO", "Assistente"]:
-            if st.button("👥 Gestão de Colaboradores"):
-                st.session_state.current_page = "colaboradores"
+        if st.button("👥 Gestão de Colaboradores"):
+            st.session_state["current_page"] = "colaboradores"
+            st.experimental_rerun()
 
     with col3:
         if st.button("🛠️ Helpdesk"):
-            st.session_state.current_page = "helpdesk"
+            st.session_state["current_page"] = "helpdesk"
+            st.experimental_rerun()
 
-    with col4:
-        logout()
+    # 🔹 Controle de navegação entre as páginas
+    if st.session_state["current_page"] == "estoque":
+        st.subheader("📦 Gestão de Estoque")
+        st.write("Aqui ficará a funcionalidade de gestão de estoque.")
 
-    if st.session_state.current_page == "estoque":
-        st.title("📦 Gestão de Estoque")
-    elif st.session_state.current_page == "colaboradores":
-        st.title("👥 Gestão de Colaboradores")
-    elif st.session_state.current_page == "helpdesk":
-        st.title("🛠️ Helpdesk")
+    elif st.session_state["current_page"] == "colaboradores":
+        st.subheader("👥 Gestão de Colaboradores")
+        st.write("Aqui ficará a funcionalidade de gestão de colaboradores.")
+
+    elif st.session_state["current_page"] == "helpdesk":
+        st.subheader("🛠️ Helpdesk")
+        st.write("Aqui ficará o sistema de suporte interno.")
+
+    # 🔹 Menu lateral para logout
+    st.sidebar.title("📌 Opções")
+    if st.sidebar.button("🔄 Logout"):
+        st.session_state.clear()
+        st.experimental_rerun()
