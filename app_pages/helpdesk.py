@@ -36,6 +36,7 @@ def show():
     if user_data["cargo"] == "Diretor de Operações (COO)":
         st.subheader("📝 Aprovação de Chamados")
         chamados_pendentes = get_pending_tickets()
+        st.write(chamados_pendentes)
 
         if chamados_pendentes:
             for chamado in chamados_pendentes:
