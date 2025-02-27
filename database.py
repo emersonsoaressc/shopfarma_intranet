@@ -112,4 +112,4 @@ def upload_file(ticket_id, file_type, file_url, usuario_id):
             "data_hora": datetime.datetime.utcnow().isoformat()
         })
 
-        ticket_ref.update(ticket_data)
+        ticket_ref.update(ticket_data) 
