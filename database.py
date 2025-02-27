@@ -162,10 +162,19 @@ def upload_file(ticket_id, file_type, file_url, usuario_id):
 
         ticket_ref.update(ticket_data)
 
-def get_pending_tickets(status="Pendente"):
-    """Retorna todos os chamados com o status especificado."""
-    tickets = db.collection("chamados").where("status", "==", status).stream()
-    return [{"id": ticket.id, **ticket.to_dict()} for ticket in tickets]
+def get_pending_tickets():
+    """Retorna chamados que estão pendentes de aprovação."""
+    try:
+        tickets_ref = db.collection("chamados").where("status", "==", "Aberto").stream()
+        chamados = [{"id": ticket.id, **ticket.to_dict()} for ticket in tickets_ref]
+        
+        print(f"📌 CHAMADOS PENDENTES PARA APROVAÇÃO: {chamados}")  # Debug no log
+
+        return chamados
+    except Exception as e:
+        print(f"⚠️ ERRO AO BUSCAR CHAMADOS PENDENTES: {e}")
+        return []  # Retorna lista vazia em caso de erro
+
 
 def get_all_tickets():
     """Retorna TODOS os chamados (para testar se há dados no Firestore)"""

@@ -32,41 +32,33 @@ def show():
     else:
         st.info("Nenhum chamado encontrado.")
 
-    # 🔹 Aprovação de Chamados (Somente COO)
+ # 🔹 Se usuário for COO, exibe a seção de aprovação
     if user_data["cargo"] == "Diretor de Operações (COO)":
         st.subheader("📝 Aprovação de Chamados")
+        chamados_pendentes = get_pending_tickets()
 
-        chamados_pendentes = get_pending_tickets("Pendente")
-
-        if not chamados_pendentes:
-            st.success("✅ Nenhum chamado pendente no momento.")
-        else:
+        if chamados_pendentes:
             for chamado in chamados_pendentes:
-                with st.expander(f"📌 {chamado['titulo']} ({chamado['categoria']}) - {chamado['loja']}"):
+                with st.expander(f"📌 {chamado['titulo']} - {chamado['status']}"):
                     st.write(f"**Descrição:** {chamado['descricao']}")
-                    st.write(f"**Aberto por:** {chamado['usuario']} em {chamado['data_abertura']}")
-                    
-                    # 🔹 Selecionar responsáveis
-                    st.subheader("👥 Definir Responsáveis")
-                    responsavel_financeiro = st.selectbox("📑 Analista Financeiro", ["Nenhum", "Maria Silva", "Carlos Mendes"])
-                    responsavel_outro = st.text_input("🔧 Outro Responsável (TI, Técnico, etc.)")
+                    st.write(f"**Categoria:** {chamado['categoria']}")
+                    st.write(f"**Urgência:** {chamado['urgencia']}")
+                    st.write(f"**Centro de Custo:** {chamado['loja']}")
 
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        if st.button(f"✅ Aprovar Chamado {chamado['id']}", key=f"approve_{chamado['id']}"):
-                            update_ticket_status(
-                                chamado["id"], "Aprovado pelo COO", user_data["email"], 
-                                responsavel_financeiro, "Emerson Soares", responsavel_outro
-                            )
-                            st.success(f"✅ Chamado {chamado['id']} aprovado e responsáveis definidos!")
-                            st.experimental_rerun()
+                    # Exibir histórico do chamado
+                    st.write("**Histórico:**")
+                    for event in chamado["historico"]:
+                        st.write(f"- {event['acao']} ({event['responsavel']} - {event['data_hora']})")
 
-                    with col2:
-                        if st.button(f"❌ Rejeitar Chamado {chamado['id']}", key=f"reject_{chamado['id']}"):
-                            update_ticket_status(chamado["id"], "Rejeitado", user_data["email"])
-                            st.warning(f"❌ Chamado {chamado['id']} rejeitado.")
-                            st.experimental_rerun()
-
+                    # Aprovação do COO
+                    if st.button(f"✅ Aprovar {chamado['titulo']}", key=f"approve_{chamado['id']}"):
+                        update_ticket_status(chamado["id"], "Aprovado pelo COO", user_data["email"])
+                        st.success(f"✅ Chamado {chamado['titulo']} aprovado!")
+                        st.experimental_rerun()
+        else:
+            st.success("✅ Nenhum chamado pendente no momento.")
+            
+            
     # 🔹 Botão para abrir chamado
     st.subheader("➕ Novo Chamado")
     if st.button("📌 Abrir Chamado"):
