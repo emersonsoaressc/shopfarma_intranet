@@ -1,6 +1,22 @@
 import firebase_admin
 from firebase_admin import credentials, firestore
 import hashlib
+import os
+
+# 🔹 Verifique se o arquivo existe antes de carregar as credenciais
+FIREBASE_CREDENTIALS_PATH = "firebase_config.json"
+
+if not os.path.exists(FIREBASE_CREDENTIALS_PATH):
+    raise FileNotFoundError("❌ Arquivo 'firebase_config.json' não encontrado. Certifique-se de que ele está no diretório correto.")
+
+# 🔹 Inicializar o Firebase apenas se ainda não foi inicializado
+if not firebase_admin._apps:
+    cred = credentials.Certificate(FIREBASE_CREDENTIALS_PATH)
+    firebase_admin.initialize_app(cred)
+
+# 🔹 Conectar ao Firestore
+db = firestore.client()
+
 
 # 🔹 Verifica se o Firebase já foi inicializado antes de chamar initialize_app()
 if not firebase_admin._apps:
