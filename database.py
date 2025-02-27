@@ -47,12 +47,23 @@ def create_user(nome, email, senha, cargo, loja, whatsapp):
     doc_ref.set(user_data)
     return True
 
-def get_user(email):
-    """Retorna um usuário se ele existir e estiver aprovado"""
-    doc = db.collection("usuarios").document(email).get()
-    if doc.exists:
-        return doc.to_dict()
-    return None
+def get_user(email, senha):
+    """Busca um usuário no Firestore com base no e-mail e senha."""
+    db = firestore.client()
+    users_ref = db.collection("usuarios")
+
+    # 🔹 Busca o usuário pelo e-mail
+    query = users_ref.where("email", "==", email).stream()
+    for doc in query:
+        user = doc.to_dict()
+        
+        # 🔹 Verifica a senha antes de retornar os dados
+        if "senha" in user and user["senha"] == senha:
+            return user  # ✅ Retorna os dados do usuário se a senha estiver correta
+    
+    return None  # ❌ Retorna None se o usuário não for encontrado ou a senha estiver errada
+
+
 
 def get_pending_users():
     """Retorna usuários pendentes de aprovação"""
