@@ -1,5 +1,5 @@
 import streamlit as st
-from database import get_user_tickets, update_ticket_status, get_pending_tickets, get_all_tickets
+from database import get_user_tickets, update_ticket_status, get_pending_tickets, get_all_tickets, get_aproved_users
 from auth import check_session
 import app_pages.open_ticket as open_ticket  # Importa o novo arquivo para abertura de chamados
 
@@ -50,11 +50,20 @@ def show():
                     for event in chamado["historico"]:
                         st.write(f"- {event['acao']} ({event['responsavel']} - {event['data_hora']})")
 
-                    # Aprovação do COO
-                    if st.button(f"✅ Aprovar {chamado['titulo']}", key=f"approve_{chamado['id']}"):
-                        update_ticket_status(chamado["id"], "Aprovado pelo COO", user_data["email"])
-                        st.success(f"✅ Chamado {chamado['titulo']} aprovado!")
-                        st.rerun()
+                    # Buscar usuários aprovados para designação
+                    usuarios_aprovados = get_aproved_users()
+                    opcoes_usuarios = {u["email"]: u["nome"] for u in usuarios_aprovados}
+
+                    responsavel = st.selectbox(
+                        "👤 Escolha o responsável pelo chamado:",
+                        options=list(opcoes_usuarios.keys()),
+                        format_func=lambda x: opcoes_usuarios[x]
+                    )
+
+                    if st.button(f"✅ Aprovar e Designar Responsável ({chamado['titulo']})"):
+                        update_ticket_status(chamado["id"], "Aprovado pelo COO", user_data["email"], responsavel)
+                        st.success(f"✅ Chamado aprovado e atribuído a {opcoes_usuarios[responsavel]}")
+                        st.experimental_rerun()
         else:
             st.success("✅ Nenhum chamado pendente no momento.")
             

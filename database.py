@@ -144,24 +144,28 @@ def get_user_tickets(usuario_id):
     tickets = db.collection("chamados").where("usuario_id", "==", usuario_id).stream()  # 🔹 CORRIGIDO
     return [{"id": ticket.id, **ticket.to_dict()} for ticket in tickets]
 
-def update_ticket_status(ticket_id, new_status, usuario_id, responsaveis=None):
-    """Atualiza o status de um chamado e registra no histórico."""
+def update_ticket_status(ticket_id, new_status, usuario_id, responsavel_email=None):
+    """Atualiza o status de um chamado e registra no histórico"""
     ticket_ref = db.collection("chamados").document(ticket_id)
     ticket = ticket_ref.get()
 
     if ticket.exists:
         ticket_data = ticket.to_dict()
         ticket_data["status"] = new_status
+
+        # Adiciona a mudança no histórico do chamado
         ticket_data["historico"].append({
             "acao": f"Status atualizado para {new_status}",
             "responsavel": usuario_id,
             "data_hora": datetime.datetime.utcnow().isoformat()
         })
 
-        if responsaveis:
-            ticket_data["responsaveis"].update(responsaveis)
+        # Se um responsável foi designado, atualizar o chamado
+        if responsavel_email:
+            ticket_data["responsaveis"]["Proximo"] = responsavel_email
 
         ticket_ref.update(ticket_data)
+
 
 def upload_file(ticket_id, file_type, file_url, usuario_id):
     """Faz o upload de arquivos (orçamentos, notas fiscais, boletos) e atualiza o chamado."""
