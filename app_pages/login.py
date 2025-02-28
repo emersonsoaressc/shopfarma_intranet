@@ -56,6 +56,7 @@ def show():
             "Fiscal de Auditoria e Compliance",
             "Analista de Marketing",
         ])
+        
         if cargo == "Líder de Loja":
             loja = st.selectbox("Selecione sua Loja", [
                 "001 - Matriz", 
@@ -70,7 +71,7 @@ def show():
             ])  
         else:
             loja = ["100 - Central"]
-
+        st.write(cargo)
         col1, col2 = st.columns(2)
         with col1:
             if st.button("Registrar"):
