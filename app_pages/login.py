@@ -69,7 +69,7 @@ def show():
                 "012 - Palhoça"
             ])  
         else:
-            loja = "100 - Central"
+            loja = ["100 - Central"]
 
         col1, col2 = st.columns(2)
         with col1:
