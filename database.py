@@ -45,7 +45,7 @@ def create_user(nome, email, senha, cargo, loja, whatsapp):
         "cargo": cargo,
         "loja": loja,
         "whatsapp": whatsapp,
-        "status": "Pendente"  # O usuário começa com status pendente até ser aprovado pelo COO
+        "status": False  # O usuário começa com status pendente até ser aprovado pelo COO
     }
 
     if not validate_schema(user_data, USER_SCHEMA):
