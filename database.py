@@ -144,6 +144,12 @@ def get_user_tickets(usuario_id):
     tickets = db.collection("chamados").where("usuario_id", "==", usuario_id).stream()  # 🔹 CORRIGIDO
     return [{"id": ticket.id, **ticket.to_dict()} for ticket in tickets]
 
+def get_aproved_users():
+    """Retorna todos os usuários aprovados no sistema"""
+    users_ref = db.collection("usuarios").where("aprovado", "==", True).stream()
+    return [{"email": user.id, **user.to_dict()} for user in users_ref]
+
+
 def update_ticket_status(ticket_id, new_status, usuario_id, responsavel_email=None):
     """Atualiza o status de um chamado e registra no histórico"""
     ticket_ref = db.collection("chamados").document(ticket_id)
