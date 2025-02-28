@@ -144,6 +144,16 @@ def get_user_tickets(usuario_id):
     tickets = db.collection("chamados").where("usuario_id", "==", usuario_id).stream()  # 🔹 CORRIGIDO
     return [{"id": ticket.id, **ticket.to_dict()} for ticket in tickets]
 
+def get_user_related_tickets(usuario_email):
+    """Retorna chamados onde o usuário está envolvido (COO, Financeiro, CEO ou Criador)"""
+    tickets = db.collection("chamados").where("responsaveis", "array_contains_any", [usuario_email]).stream()
+    return [{"id": ticket.id, **ticket.to_dict()} for ticket in tickets]
+
+def get_current_responsavel(ticket):
+    """Retorna quem é o responsável atual do chamado"""
+    return ticket["responsaveis"].get("Proximo", "")
+
+
 def get_aproved_users():
     """Retorna todos os usuários aprovados no sistema"""
     users_ref = db.collection("usuarios").where("aprovado", "==", True).stream()
