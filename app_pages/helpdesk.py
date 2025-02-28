@@ -44,6 +44,7 @@ def show():
                     st.write(f"**Categoria:** {chamado['categoria']}")
                     st.write(f"**Urgência:** {chamado['urgencia']}")
                     st.write(f"**Centro de Custo:** {chamado['loja']}")
+                    st.write(f"**Aguardando por:** {chamado['responsaveis']['Proximo']}")
 
                     # Exibir histórico do chamado
                     st.write("**Histórico:**")
