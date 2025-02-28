@@ -27,7 +27,7 @@ def show():
                 st.write(f"**Histórico:**")
                 for event in ticket["historico"]:
                     st.write(f"- {event['acao']} ({event['responsavel']} - {event['data_hora']})")
-                st.write(f"**Aguardando por:** {ticket['responsaveis']['Proximo']}")
+                #st.write(f"**Aguardando por:** {ticket['responsaveis']['Proximo']}")
 
     else:
         st.info("Nenhum chamado encontrado.")
