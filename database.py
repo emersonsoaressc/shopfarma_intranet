@@ -32,6 +32,11 @@ db = firestore.client()
 
 def create_user(nome, email, senha, cargo, loja, whatsapp):
     """Cria um novo usuário no Firestore com senha hash."""
+
+    # 🔹 Define um valor padrão para 'loja' caso seja None
+    if not loja:
+        loja = "100 - Central"
+
     users_ref = db.collection("usuarios").document(email)
 
     if users_ref.get().exists:
@@ -39,15 +44,21 @@ def create_user(nome, email, senha, cargo, loja, whatsapp):
 
     hashed_password = hashlib.sha256(senha.encode()).hexdigest()
     user_data = {
-        "nome": nome,
-        "email": email,
-        "senha": str(hashed_password),
-        "cargo": cargo,
-        "loja": loja,
-        "whatsapp": whatsapp,
-        "status": False  # O usuário começa com status pendente até ser aprovado pelo COO
+        "nome": nome.strip(),
+        "email": email.strip(),
+        "senha": hashed_password,
+        "cargo": cargo.strip(),
+        "loja": loja.strip() if loja else None,  # Loja pode ser string ou None
+        "whatsapp": whatsapp.strip(),
+        "aprovado": False  # O usuário começa como não aprovado
     }
 
+    # 🔹 Checa se todos os campos obrigatórios estão presentes
+    for field in USER_SCHEMA.keys():
+        if field not in user_data:
+            raise ValueError(f"O campo {field} está ausente.")
+
+    # 🔹 Valida o esquema antes de inserir no Firestore
     if not validate_schema(user_data, USER_SCHEMA):
         raise ValueError("Os dados do usuário não correspondem ao esquema definido.")
 
