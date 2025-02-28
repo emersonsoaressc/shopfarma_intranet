@@ -88,20 +88,25 @@ def show():
                 st.write("📜 **Histórico:**")
                 for evento in chamado["historico"]:
                     st.write(f"- {evento['acao']} ({evento['responsavel']} - {evento['data_hora']})")
+                    if "parecer" in evento:
+                        st.write(f"💬 **Parecer:** {evento['parecer']}")
 
-                # 🔹 Se for o analista financeiro, permitir anexar orçamentos
+                # 🔹 Se for o Analista Financeiro, permitir anexar orçamentos e parecer
                 if user_data["cargo"] == "Assistente Financeiro":
-                    st.subheader("📑 Anexar Orçamentos")
+                    st.subheader("📑 Anexar Orçamentos e Parecer")
 
-                    orcamento_url = st.text_input("🔗 Link do orçamento")
+                    parecer = st.text_area("💬 Escreva seu parecer sobre o orçamento")
+                    orcamento_file = st.file_uploader("📂 Faça o upload do PDF do orçamento", type=["pdf"])
+
+                    enviar_para = st.radio("📤 Enviar orçamento para:", ["CEO", "COO"], horizontal=True)
+
                     if st.button("📤 Enviar Orçamento"):
-                        if orcamento_url:
-                            anexar_orcamento(chamado["id"], user_data["email"], orcamento_url)
-                            st.success("✅ Orçamento anexado com sucesso! O chamado foi enviado para o CEO.")
+                        if orcamento_file and parecer:
+                            anexar_orcamento(chamado["id"], user_data["email"], orcamento_file, parecer, enviar_para)
+                            st.success(f"✅ Orçamento anexado e enviado para {enviar_para} com sucesso!")
                             st.experimental_rerun()
                         else:
-                            st.warning("⚠️ Insira um link válido do orçamento.")
-            
+                            st.warning("⚠️ Você precisa anexar um PDF e escrever um parecer antes de enviar.")
             
             
             

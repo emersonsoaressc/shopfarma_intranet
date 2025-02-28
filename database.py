@@ -223,27 +223,32 @@ def get_assigned_tickets(usuario_email):
     tickets = db.collection("chamados").where("responsaveis.Proximo", "==", usuario_email).stream()
     return [{"id": ticket.id, **ticket.to_dict()} for ticket in tickets]
 
-def anexar_orcamento(ticket_id, usuario_email, orcamento_url):
-    """Anexa orçamento ao chamado e atualiza o status"""
+def anexar_orcamento(ticket_id, usuario_email, orcamento_file, parecer, enviar_para):
+    """Anexa orçamento ao chamado, registra o parecer e atualiza o fluxo"""
+
     ticket_ref = db.collection("chamados").document(ticket_id)
     ticket = ticket_ref.get()
 
     if ticket.exists:
         ticket_data = ticket.to_dict()
-        
-        ticket_data["anexos"]["orcamentos"].append(orcamento_url)
 
-        # Atualiza histórico
+        # Simulando o armazenamento do arquivo no Firebase Storage
+        orcamento_url = f"https://storage.firebase.com/orcamentos/{ticket_id}/{orcamento_file.name}"
+
+        ticket_data["anexos"]["orcamentos"].append(orcamento_url)
         ticket_data["historico"].append({
             "acao": "Orçamento anexado",
             "responsavel": usuario_email,
-            "data_hora": datetime.datetime.utcnow().isoformat()
+            "data_hora": datetime.datetime.utcnow().isoformat(),
+            "parecer": parecer
         })
 
-        # Se for analista financeiro, avança o chamado para o CEO
-        if ticket_data["responsaveis"]["Proximo"] == usuario_email:
+        # Atualizar o fluxo conforme decisão do Analista Financeiro
+        if enviar_para == "COO":
+            ticket_data["responsaveis"]["Proximo"] = ticket_data["responsaveis"]["COO"]
+            ticket_data["status"] = "Revisão pelo COO"
+        else:
             ticket_data["responsaveis"]["Proximo"] = ticket_data["responsaveis"]["CEO"]
             ticket_data["status"] = "Orçamentos apresentados"
 
         ticket_ref.update(ticket_data)
-
