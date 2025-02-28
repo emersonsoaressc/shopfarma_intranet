@@ -7,7 +7,7 @@ USER_SCHEMA = {
     "email": str,
     "senha": str,  # 🔹 Idealmente, armazenada de forma segura (hash)
     "cargo": str,
-    "loja": (str, type(None)),  # Pode ser string ou None
+    "loja": str,  # Pode ser string ou None
     "whatsapp": str,
     "aprovado": bool
 }
