@@ -33,7 +33,7 @@ def show():
                 st.write(f"**Urgência:** {ticket['urgencia']}")
                 st.write(f"**Centro de Custo:** {ticket['loja']}")
                 st.write(f"🎯 **Responsável Atual:** {ticket['responsaveis'].get('Proximo', 'Nenhum')}")
-                
+
                 st.write(f"**Histórico:**")
                 for event in ticket["historico"]:
                     st.write(f"- {event['acao']} ({event['responsavel']} - {event['data_hora']})")
@@ -59,20 +59,22 @@ def show():
                     for event in chamado["historico"]:
                         st.write(f"- {event['acao']} ({event['responsavel']} - {event['data_hora']})")
 
-                    # Buscar usuários aprovados para designação
-                    usuarios_aprovados = get_aproved_users()
-                    opcoes_usuarios = {u["email"]: u["nome"] for u in usuarios_aprovados}
-
-                    responsavel = st.selectbox(
-                        "👤 Escolha o responsável a ser designado pelo chamado:",
-                        options=list(opcoes_usuarios.keys()),
-                        format_func=lambda x: opcoes_usuarios[x]
-                    )
-
-                    if st.button(f"✅ Aprovar e Designar Responsável ({chamado['titulo']})"):
-                        update_ticket_status(chamado["id"], "Aprovado pelo COO", user_data["email"], responsavel)
-                        st.success(f"✅ Chamado aprovado e atribuído a {opcoes_usuarios[responsavel]}")
+                    # Opção de Aprovação
+                    if st.button(f"✅ Aprovar Chamado ({chamado['titulo']})"):
+                        update_ticket_status(chamado["id"], "Aprovado pelo COO", user_data["email"], "Assistente Financeiro")
+                        st.success(f"✅ Chamado aprovado e atribuído ao Assistente Financeiro")
                         st.rerun()
+
+                    # Opção de Recusa
+                    justificativa = st.text_area("❌ Justificativa para recusa", key=f"justificativa_{chamado['id']}")
+                    if st.button(f"❌ Recusar Chamado ({chamado['titulo']})"):
+                        if justificativa.strip():
+                            update_ticket_status(chamado["id"], "Recusado", user_data["email"], "Finalizado", justificativa)
+                            st.error(f"❌ Chamado recusado! Justificativa: {justificativa}")
+                            st.rerun()
+                        else:
+                            st.warning("⚠️ Você precisa fornecer uma justificativa para a recusa.")
+
         else:
             st.success("✅ Nenhum chamado pendente no momento.")
 
@@ -104,16 +106,10 @@ def show():
                     parecer = st.text_area("💬 Escreva seu parecer sobre o orçamento")
                     orcamento_file = st.file_uploader("📂 Faça o upload do PDF do orçamento", type=["pdf"])
 
-                    enviar_para = st.selectbox(
-                        "👤 Escolha o responsável a ser designado pelo chamado:",
-                        options=list(opcoes_usuarios.keys()),
-                        format_func=lambda x: opcoes_usuarios[x]
-                    )
-
-                    if st.button("📤 Enviar Orçamento"):
+                    if st.button("📤 Enviar Orçamento para COO"):
                         if orcamento_file and parecer:
-                            anexar_orcamento(chamado["id"], user_data["email"], orcamento_file, parecer, enviar_para)
-                            st.success(f"✅ Orçamento anexado e enviado para {enviar_para} com sucesso!")
+                            anexar_orcamento(chamado["id"], user_data["email"], orcamento_file, parecer, "Diretor de Operações (COO)")
+                            st.success(f"✅ Orçamento anexado e enviado para o COO para análise!")
                             st.rerun()
                         else:
                             st.warning("⚠️ Você precisa anexar um PDF e escrever um parecer antes de enviar.")
