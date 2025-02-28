@@ -55,7 +55,7 @@ def show():
                     opcoes_usuarios = {u["email"]: u["nome"] for u in usuarios_aprovados}
 
                     responsavel = st.selectbox(
-                        "👤 Escolha o responsável pelo chamado:",
+                        "👤 Escolha o responsável a ser designado pelo chamado:",
                         options=list(opcoes_usuarios.keys()),
                         format_func=lambda x: opcoes_usuarios[x]
                     )
@@ -63,7 +63,7 @@ def show():
                     if st.button(f"✅ Aprovar e Designar Responsável ({chamado['titulo']})"):
                         update_ticket_status(chamado["id"], "Aprovado pelo COO", user_data["email"], responsavel)
                         st.success(f"✅ Chamado aprovado e atribuído a {opcoes_usuarios[responsavel]}")
-                        st.experimental_rerun()
+                        st.rerun()
         else:
             st.success("✅ Nenhum chamado pendente no momento.")
             
