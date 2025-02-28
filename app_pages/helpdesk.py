@@ -104,7 +104,7 @@ def show():
                         if orcamento_file and parecer:
                             anexar_orcamento(chamado["id"], user_data["email"], orcamento_file, parecer, enviar_para)
                             st.success(f"✅ Orçamento anexado e enviado para {enviar_para} com sucesso!")
-                            st.experimental_rerun()
+                            st.rerun()
                         else:
                             st.warning("⚠️ Você precisa anexar um PDF e escrever um parecer antes de enviar.")
             
