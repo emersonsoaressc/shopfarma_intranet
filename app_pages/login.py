@@ -67,7 +67,7 @@ def show():
             "010 - UPA Norte",
             "011 - Trindade",
             "012 - Palhoça"
-        ]) if cargo == "Líder de Loja" else None
+        ]) if cargo == "Líder de Loja" else loja = "100 - Central"
 
         col1, col2 = st.columns(2)
         with col1:
