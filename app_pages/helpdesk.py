@@ -25,6 +25,7 @@ def show():
                 st.write(f"**Urgência:** {ticket['urgencia']}")
                 st.write(f"**Centro de Custo:** {ticket['loja']}")
                 st.write(f"**Histórico:**")
+                st.write(f"**Aguardando por:** {ticket['responsaveis']['Proximo']}")
 
                 for event in ticket["historico"]:
                     st.write(f"- {event['acao']} ({event['responsavel']} - {event['data_hora']})")
@@ -44,7 +45,7 @@ def show():
                     st.write(f"**Categoria:** {chamado['categoria']}")
                     st.write(f"**Urgência:** {chamado['urgencia']}")
                     st.write(f"**Centro de Custo:** {chamado['loja']}")
-                    st.write(f"**Aguardando por:** {chamado['responsaveis']['Proximo']}")
+                    
 
                     # Exibir histórico do chamado
                     st.write("**Histórico:**")
