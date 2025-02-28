@@ -41,7 +41,7 @@ def create_user(nome, email, senha, cargo, loja, whatsapp):
     user_data = {
         "nome": nome,
         "email": email,
-        "senha": hashed_password,
+        "senha": str(hashed_password),
         "cargo": cargo,
         "loja": loja,
         "whatsapp": whatsapp,
