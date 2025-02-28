@@ -217,3 +217,33 @@ def get_all_tickets():
     print(f"📋 Todos os chamados: {chamados}")  # Debug no terminal
     
     return chamados
+
+def get_assigned_tickets(usuario_email):
+    """Retorna os chamados atribuídos ao usuário"""
+    tickets = db.collection("chamados").where("responsaveis.Proximo", "==", usuario_email).stream()
+    return [{"id": ticket.id, **ticket.to_dict()} for ticket in tickets]
+
+def anexar_orcamento(ticket_id, usuario_email, orcamento_url):
+    """Anexa orçamento ao chamado e atualiza o status"""
+    ticket_ref = db.collection("chamados").document(ticket_id)
+    ticket = ticket_ref.get()
+
+    if ticket.exists:
+        ticket_data = ticket.to_dict()
+        
+        ticket_data["anexos"]["orcamentos"].append(orcamento_url)
+
+        # Atualiza histórico
+        ticket_data["historico"].append({
+            "acao": "Orçamento anexado",
+            "responsavel": usuario_email,
+            "data_hora": datetime.datetime.utcnow().isoformat()
+        })
+
+        # Se for analista financeiro, avança o chamado para o CEO
+        if ticket_data["responsaveis"]["Proximo"] == usuario_email:
+            ticket_data["responsaveis"]["Proximo"] = ticket_data["responsaveis"]["CEO"]
+            ticket_data["status"] = "Orçamentos apresentados"
+
+        ticket_ref.update(ticket_data)
+

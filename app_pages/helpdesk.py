@@ -1,5 +1,5 @@
 import streamlit as st
-from database import get_user_tickets, update_ticket_status, get_pending_tickets, get_all_tickets, get_aproved_users
+from database import get_user_tickets, update_ticket_status, get_pending_tickets, get_all_tickets, get_aproved_users, get_assigned_tickets, anexar_orcamento
 from auth import check_session
 import app_pages.open_ticket as open_ticket  # Importa o novo arquivo para abertura de chamados
 
@@ -67,6 +67,45 @@ def show():
                         st.rerun()
         else:
             st.success("✅ Nenhum chamado pendente no momento.")
+
+
+    st.title("🛠️ Helpdesk - Meus Chamados Atribuídos")
+
+    chamados_atribuidos = get_assigned_tickets(user_data["email"])
+
+    if not chamados_atribuidos:
+        st.info("📌 Nenhum chamado atribuído a você no momento.")
+    else:
+        for chamado in chamados_atribuidos:
+            with st.expander(f"{chamado['titulo']} - {chamado['status']}"):
+
+                st.write(f"📍 **Loja:** {chamado['loja']}")
+                st.write(f"📂 **Categoria:** {chamado['categoria']}")
+                st.write(f"📜 **Descrição:** {chamado['descricao']}")
+                st.write(f"🚀 **Urgência:** {chamado['urgencia']}")
+
+                # Exibir histórico do chamado
+                st.write("📜 **Histórico:**")
+                for evento in chamado["historico"]:
+                    st.write(f"- {evento['acao']} ({evento['responsavel']} - {evento['data_hora']})")
+
+                # 🔹 Se for o analista financeiro, permitir anexar orçamentos
+                if user_data["cargo"] == "Assistente Financeiro":
+                    st.subheader("📑 Anexar Orçamentos")
+
+                    orcamento_url = st.text_input("🔗 Link do orçamento")
+                    if st.button("📤 Enviar Orçamento"):
+                        if orcamento_url:
+                            anexar_orcamento(chamado["id"], user_data["email"], orcamento_url)
+                            st.success("✅ Orçamento anexado com sucesso! O chamado foi enviado para o CEO.")
+                            st.experimental_rerun()
+                        else:
+                            st.warning("⚠️ Insira um link válido do orçamento.")
+            
+            
+            
+            
+            
             
             
     # 🔹 Botão para abrir chamado
