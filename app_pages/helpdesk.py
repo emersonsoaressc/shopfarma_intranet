@@ -98,7 +98,7 @@ def show():
                     parecer = st.text_area("💬 Escreva seu parecer sobre o orçamento")
                     orcamento_file = st.file_uploader("📂 Faça o upload do PDF do orçamento", type=["pdf"])
 
-                    enviar_para = st.radio("📤 Enviar orçamento para:", ["CEO", "COO"], horizontal=True)
+                    enviar_para = st.radio("📤 Enviar orçamento para:", ["COO", "CEO"], horizontal=True)
 
                     if st.button("📤 Enviar Orçamento"):
                         if orcamento_file and parecer:
