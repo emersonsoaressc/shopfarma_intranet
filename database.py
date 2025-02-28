@@ -219,9 +219,10 @@ def get_all_tickets():
     return chamados
 
 def get_assigned_tickets(usuario_email):
-    """Retorna os chamados atribuídos ao usuário"""
+    """Retorna chamados atribuídos a um usuário"""
     tickets = db.collection("chamados").where("responsaveis.Proximo", "==", usuario_email).stream()
     return [{"id": ticket.id, **ticket.to_dict()} for ticket in tickets]
+
 
 def anexar_orcamento(ticket_id, usuario_email, orcamento_file, parecer, enviar_para):
     """Anexa orçamento ao chamado, registra o parecer e atualiza o fluxo"""
@@ -243,12 +244,12 @@ def anexar_orcamento(ticket_id, usuario_email, orcamento_file, parecer, enviar_p
             "parecer": parecer
         })
 
-        # Atualizar o fluxo conforme decisão do Analista Financeiro
+        # **🔹 Atualizar o responsável e status do chamado**
         if enviar_para == "COO":
             ticket_data["responsaveis"]["Proximo"] = ticket_data["responsaveis"]["COO"]
             ticket_data["status"] = "Revisão pelo COO"
         else:
             ticket_data["responsaveis"]["Proximo"] = ticket_data["responsaveis"]["CEO"]
-            ticket_data["status"] = "Orçamentos apresentados"
+            ticket_data["status"] = "Aguardando Aprovação do CEO"
 
         ticket_ref.update(ticket_data)

@@ -107,7 +107,7 @@ def show():
                             st.rerun()
                         else:
                             st.warning("⚠️ Você precisa anexar um PDF e escrever um parecer antes de enviar.")
-            
+
             
             
             
