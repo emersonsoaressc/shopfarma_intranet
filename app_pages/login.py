@@ -56,18 +56,20 @@ def show():
             "Fiscal de Auditoria e Compliance",
             "Analista de Marketing",
         ])
-
-        loja = st.selectbox("Selecione sua Loja", [
-            "001 - Matriz", 
-            "004 - Centrinho", 
-            "005 - Calil", 
-            "007 - Rio vermelho",
-            "008 - Vargem Grande",
-            "009 - Canasvieiras",
-            "010 - UPA Norte",
-            "011 - Trindade",
-            "012 - Palhoça"
-        ]) if cargo == "Líder de Loja" else loja = "100 - Central"
+        if cargo == "Líder de Loja":
+            loja = st.selectbox("Selecione sua Loja", [
+                "001 - Matriz", 
+                "004 - Centrinho", 
+                "005 - Calil", 
+                "007 - Rio vermelho",
+                "008 - Vargem Grande",
+                "009 - Canasvieiras",
+                "010 - UPA Norte",
+                "011 - Trindade",
+                "012 - Palhoça"
+            ])  
+        else:
+            loja = "100 - Central"
 
         col1, col2 = st.columns(2)
         with col1:
