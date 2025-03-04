@@ -4,6 +4,7 @@ import streamlit as st
 import datetime
 import hashlib
 from schemas import USER_SCHEMA, TICKET_SCHEMA, validate_schema
+from datetime import datetime
 
 # 🔹 Carregar credenciais do Firebase do Streamlit Secrets
 firebase_secrets = {
@@ -263,3 +264,5 @@ def anexar_orcamento(ticket_id, usuario_email, orcamento_file, parecer, enviar_p
             ticket_data["status"] = "Aguardando Aprovação do CEO"
 
         ticket_ref.update(ticket_data)
+        
+        
